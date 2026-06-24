@@ -202,16 +202,30 @@ public final class OmniItemStacksResourceHandler extends ItemStacksResourceHandl
             return -1;
         }
 
-        var existingMaterialSlot = this.chooseLowestOccupiedCompatibleSlot(new int[] {0, 1}, resource);
+        if (this.isExperienceEssence(resource)) {
+            if (this.canInsertInto(1, resource) && this.canStackInto(1, resource)) {
+                return 1;
+            }
 
-        if (existingMaterialSlot >= 0) {
-            return existingMaterialSlot;
+            return -1;
         }
 
-        for (var slot : new int[] {0, 1}) {
-            if (this.isEmptySlot(slot) && this.canInsertInto(slot, resource) && this.canStackInto(slot, resource)) {
-                return slot;
+        if (DynamicRecipeSupport.isEnchanterMaterial(this.tile, resource)
+            && this.canInsertInto(0, resource)
+            && this.canStackInto(0, resource)) {
+            return 0;
+        }
+
+        if (this.isEnchantableItem(resource)) {
+            if (this.canInsertInto(2, resource) && this.canStackInto(2, resource)) {
+                return 2;
             }
+
+            return -1;
+        }
+
+        if (this.canInsertInto(0, resource) && this.canStackInto(0, resource)) {
+            return 0;
         }
 
         return -1;
@@ -244,13 +258,23 @@ public final class OmniItemStacksResourceHandler extends ItemStacksResourceHandl
     private boolean isEnchanterTarget(ItemResource resource) {
         var stack = resource.toStack();
 
-        return stack.is(Items.BOOK) || stack.isEnchantable();
+        return stack.is(Items.BOOK);
+    }
+
+    private boolean isEnchantableItem(ItemResource resource) {
+        return resource.toStack().isEnchantable();
     }
 
     private boolean isAwakeningEssence(ItemResource resource) {
         var itemId = BuiltInRegistries.ITEM.getKey(resource.getItem());
 
         return "mysticalagriculture".equals(itemId.getNamespace()) && itemId.getPath().endsWith("_essence");
+    }
+
+    private boolean isExperienceEssence(ItemResource resource) {
+        var itemId = BuiltInRegistries.ITEM.getKey(resource.getItem());
+
+        return "mysticalagriculture".equals(itemId.getNamespace()) && "experience_essence".equals(itemId.getPath());
     }
 
     private int chooseLowestCompatibleSlot(ItemResource resource) {

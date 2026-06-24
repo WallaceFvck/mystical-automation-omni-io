@@ -18,7 +18,8 @@ um handler que:
   procurarem receita pelo inventario real, sem depender dos slots fantasma da
   receita.
 - no Enchanternator, assume automaticamente o maior nivel de encantamento
-  possivel com os materiais presentes.
+  possivel com os materiais presentes, roteando material principal para o slot
+  0, `experience_essence` para o slot 1 e livro/item encantavel para o slot 2.
 - no Awakening Altarnator, roteia o slot 0 como altar, 2/4/6/8 como pedestais
   e 1/3/5/7 como essencias.
 

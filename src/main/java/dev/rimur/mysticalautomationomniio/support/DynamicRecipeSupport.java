@@ -9,6 +9,7 @@ import com.blakebr0.mysticalautomation.compat.MysticalCompat;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.Nullable;
 
 public final class DynamicRecipeSupport {
@@ -79,5 +80,23 @@ public final class DynamicRecipeSupport {
 
         return new CachedRecipe<CraftingInput, IEnchanterRecipe>(MysticalCompat.RecipeTypes.ENCHANTER.get())
             .checkAndGet(enchanterInput(tile), level);
+    }
+
+    public static boolean isEnchanterMaterial(BaseInventoryTileEntity tile, ItemResource resource) {
+        if (tile.getLevel() == null || resource == null || resource.isEmpty()) {
+            return false;
+        }
+
+        var stack = resource.toStack();
+
+        return tile.getRecipeManager()
+            .recipeMap()
+            .byType(MysticalCompat.RecipeTypes.ENCHANTER.get())
+            .stream()
+            .map(holder -> holder.value())
+            .map(IEnchanterRecipe::getIngredients)
+            .flatMap(java.util.Collection::stream)
+            .map(sizedIngredient -> sizedIngredient.ingredient())
+            .anyMatch(ingredient -> ingredient.test(stack));
     }
 }
